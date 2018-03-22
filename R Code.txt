@@ -1,0 +1,251 @@
+# Reading the original data as "rawdata"
+rawdata<-read.csv("2014 Data.csv",header=T,stringsAsFactors = FALSE)
+# Subsetting the data with columns required for our analysis
+rd2<-rawdata[c(1,3,6:24,68:76,25:33,34:46,47:67,84:87,91,98)]
+# Data Cleaning - Removal of blank spaces and irregular entries such as 'X'
+rd2[rd2==""]<-NA
+rd2[rd2=="X"]<-NA
+rd2<-na.omit(rd2)
+rd2<-droplevels(rd2) # Unused levels from a data frame are dropped
+
+# Identifying the dimensions of our dataset
+dim(rd2)
+[1] 3562   79 # 79 variables of 3562 observations
+# Converting all the responses to questions (columns 3 to 77) as numeric values
+rd2[,3:77]<-as.numeric(unlist(rd2[,3:77]))
+
+#Sum of the responses in each category that form our Independent Variables
+myworkex<-rowSums(rd2[,3:21])
+myworkunit<-rowSums(rd2[,31:39])
+myagency<-rowSums(rd2[,40:52])
+suprevisor_sat<-rowSums(rd2[,53:63])
+worklife<-rowSums(rd2[,74:77])
+#Sum of the response in each category that form our Dependent Variables
+mysat<-rowSums(rd2[,22:30])
+#Attaching the independent and dependent variables to the dataset after Standardization
+rd2["myworkex"]=as.data.frame.numeric(scale(myworkex)+10)
+rd2["myworkunit"]=as.data.frame.numeric(scale(myworkunit)+10)
+rd2["myagency"]=as.data.frame.numeric(scale(myagency)+10)
+rd2["suprevisor_sat"]=as.data.frame.numeric(scale(suprevisor_sat)+10)
+rd2["mysat"]=as.data.frame.numeric(scale(mysat)+10)
+rd2["worklife"]=as.data.frame.numeric(scale(worklife)+10)
+
+
+#Univariate 
+#Descriptive Stats
+describe(rd2$N_myworkexI)
+describe(rd2$N_myworkunit)
+describe(rd2$N_myagency)
+describe(rd2$N_suprevisor_sat)
+describe(rd2$N_mysat)
+describe(rd2$N_worklife)
+
+#Solution:
+#> describe(rd2$N_myworkexI)
+  # vars    n mean sd median trimmed  mad min   max range  skew kurtosis   se
+#X1    1 3562   10  1  10.06   10.08 1.03 5.5 11.38  5.88 -0.82     0.95 0.02
+#> describe(rd2$N_myworkexI)
+ #  vars    n mean sd median trimmed  mad min   max range  skew kurtosis   se
+#X1    1 3562   10  1  10.06   10.08 1.03 5.5 11.38  5.88 -0.82     0.95 0.02
+#> describe(rd2$N_myworkunit)
+  # vars    n mean sd median trimmed  mad  min   max range  skew kurtosis   se
+#X1    1 3562   10  1  10.08   10.06 0.98 6.76 11.54  4.78 -0.55        0 0.02
+#> describe(rd2$N_myagency)
+ #  vars    n mean sd median trimmed mad  min   max range  skew kurtosis   se
+#X1    1 3562   10  1  10.13   10.07   1 6.47 11.48  5.01 -0.67     0.45 0.02
+#> describe(rd2$N_suprevisor_sat)
+  # vars    n mean sd median trimmed  mad  min  max range  skew kurtosis   se
+#X1    1 3562   10  1  10.28   10.17 0.92 6.35 10.9  4.55 -1.34     1.56 0.02
+#> describe(rd2$N_mysat)
+  # vars    n mean sd median trimmed  mad  min   max range  skew kurtosis   se
+#X1    1 3562   10  1  10.16   10.08 0.91 6.97 11.39  4.42 -0.62     0.01 0.02
+#> describe(rd2$N_worklife)
+  # vars    n mean sd median trimmed  mad min   max range  skew kurtosis   se
+#X1    1 3562   10  1  10.22   10.11 1.23 4.4 11.05  6.66 -0.81     0.73 0.02
+
+#Uniplot
+plot(density(rd2$'N_myworkunit'), col="red",
+     main="Normalized weightage of indexes", ylim=c(0,1))
+lines(density(rd2$'N_myagency'), col="blue")
+lines(density(rd2$'N_suprevisor_sat'), col="green")
+lines(density(rd2$'N_mysat'), col="orange")
+lines(density(rd2$'N_worklife'), col="brown")
+lines(density(rd2$'N_myworkex'), col="pink")
+legend('topleft',
+       c("N_myworkunit","N_myagency","N_suprevisor_sat","N_mysat",
+         "N_worklife","N_myworkex"), 
+       lty=c(1,1), 
+       lwd=c(2.5,2.5),col=c("red","blue","green","orange","brown","pink"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Bivariate Analysis
+
+#a. My Work Unit Index Vs My Satisfaction Index
+plot(myworkunit~mysat, main="My Work Unit Index Vs My Satisfaction Index")
+abline(lm(myworkunit~mysat),col="Red")
+#Correlation Coefficient, 
+cor(myworkunit,mysat)
+[1] 0.8058169
+
+
+
+
+
+
+
+
+
+
+
+
+
+#b. My Agency Vs My Satisfaction Index
+plot(myagency~mysat, main="My Agency Index Vs My Satisfaction Index")
+abline(lm(myagency~mysat),col="Red")
+#Correlation Coefficient
+cor(myagency,mysat)
+[1] 0.8624641
+
+
+#c. Suprevisor Satisfaction Index Vs My Satisfaction Index
+plot(suprevisor_sat~mysat, main="Suprevisor Satisfaction Index Vs My Satisfaction Index")
+abline(lm(suprevisor_sat~mysat),col="Red")
+#Correlation Coefficient
+cor(suprevisor_sat,mysat)
+0.7161791
+
+
+
+
+
+
+
+
+
+#d. Work Life Index Vs My Satisfaction Index
+plot(worklife~mysat, main="Work Life Index Vs My Satisfaction Index")
+abline(lm(worklife~mysat),col="Red")
+#Correlation Coefficient
+cor(worklife,mysat)
+[1] 0.47198
+
+#e. Work Experience Index Vs My Satisfaction Index
+plot(myworkex~mysat, main="Work Experience Index Vs My Satisfaction Index")
+abline(lm(myworkex~mysat),col="Red")
+#Correlation Coefficient
+cor(myworkex,mysat)
+[1] 0.8468434
+
+
+#Correlation Matrix for all the variables
+install.packages("corrplot")
+correl <- rd2[,c(86:91)]
+cormat <- cor(correl)
+library("corrplot")
+corrplot(cormat, method="circle", addCoef.col="grey")
+
+
+
+ 
+
+#On seeing the corrplot between all the variables we find that the satisfaction from work, satisfaction from agency, satisfaction from work unit and satisfaction from supervisor are highly correlated. This can lead to less significant results in the regression. Only the satisfaction from work/life programmes seem to be uncorrelated which can be used as an Independent variable.
+
+#Job Satisfaction V/S Agency
+#We plot a table of average job satisfaction between all the agencies to identify which agency #gives its employees highest job satisfaction and which agency gives the lowest job satisfaction
+aggregate(rd2$N_mysat, by=list(Category=rd2$agency), FUN=mean)
+
+#Boxplot
+boxplot(rd2$N_mysat~rd2$agency, main= "Box plot of Job Satisfaction v/s Agency", col= ("green"))
+
+#Analysis for Agency with Highest Job Satisfaction (Nuclear Regulatory Commision)
+NU<- rd2[rd2$agency== 'NU',]
+boxplot(NU$N_mysat~NU$DSEX, col= c("green","orange"),main= "Male v/s Female Job Satisfaction in Nuclear Regulatory Commission" )
+legend("bottomleft", c("Male", "Female"),lwd=3, lty=1, col=c("green", "orange"))
+
+boxplot(NU$N_mysat~NU$DAGEGRP, col= c("green","orange", "steelblue", "pink"),main= "Job Satisfaction of age group in Nuclear Regulatory Commision" )
+legend("bottomleft", c("Under 49", "Between 40 to 49", "Between 50 to 59", " 60 and older"),lwd=6, lty=1, col=c("green", "orange", "steelblue", "pink"))
+
+#Analysis for Agency with Lowest Job Satisfaction (Department of Housing and Urban Development(HU))
+boxplot(HU$mysat~HU$DSEX, col= c("green","orange"),main= "Male v/s Female Job Satisfaction in Department of Housing and Urban Development ", xlab= "Gender", ylab= "Job Satisfaction" )
+legend("bottomleft", c("Male- A", "Female- B"),lwd=3, lty=1, col=c("green", "orange"))
+
+boxplot(HU$mysat~HU$DAGEGRP, col= c("green","orange", "steelblue", "pink"),main= "Job Satisfaction of age group in Department of Housing and Urban Development" , xlab= "Agre Groups", ylab= "Job Satisfactio")
+legend("bottomright", c("Under 49", "Between 40 to 49", "Between 50 to 59", " 60 and older"),lwd=6, lty=1, col=c("green", "orange", "steelblue", "pink"))
+
+
+
+
+
+
+
+Principal Component Analysis:-
+
+#Analysis for finding correlation between independent variable
+pcaData <- data.frame(rd2[,c(86,87,88,89,91)]) #independ
+head(pcaData)
+attach(pcaData)
+
+install.packages("psych")
+require(psych)
+VSS.scree(cor(pcaData))
+pca <- principal(pcaData, nfactors=2, rotate="varimax")
+pca$loadings
+plot(pca)
+biplot(pca)
+
+ fac1<-pcaData[c(1:4)]
+ rel1<-alpha(fac1)
+ rel1
+
+
+
+
+
+Regression Code:
+
+#Linear regression before combining independent variables
+da <- lm(N_mysat~N_myworkexI+N_myworkunit+N_myagency+N_suprevisor_sat+
+           N_worklife, data = rd2)
+summary(da)
+
+#Linear regression after combining the highly correlating independent variables
+rd2["Correlated_Indp"]<-as.numeric(rowSums(rd2[,86:89]))
+rd2["N_Correlated_Indp"] = as.data.frame((scale(rd2["Correlated_Indp"] ))+10)
+
+da1 <- lm(N_mysat~N_Correlated_Indp+N_worklife, data = rd2)
+summary(da1)
+
+#Hypothesis Testing
+#Hypothesis 3
+s2.aov <- aov(N_mysat~agency, data=rd2)
+s2.aov
+summary(s2.aov)
+
+#Hypothesis 4
+s.aov <- aov(N_mysat~DSEX, data=rd2)
+s.aov
+summary(s.aov)
+
+
+
+
+
+
+
